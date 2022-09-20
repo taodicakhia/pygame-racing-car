@@ -1,6 +1,4 @@
-from trace import Trace
 import pygame
-import time
 import math
 
 class Image:
@@ -37,8 +35,9 @@ class Car:
         self.vel = 0
         self.rotation_vel = rotation_vel
         self.angle = 0
-        self.speed = 0.1
-        self.x, self.y = start_pos
+        self.speed = 0.14
+        self.start_pos = start_pos
+        self.x, self.y = self.start_pos
 
     def rotate(self, left=False, right=False):
         if left:
@@ -56,28 +55,37 @@ class Car:
 
     def move_forward(self):
         self.vel = min(self.vel + self.speed, self.max_vel)
-        self.move(forward=True)
-
+        self.move()
+              
     def move_backward(self):
-        self.vel = min(self.vel + self.speed, self.max_vel)
-        self.move(backward=True)
-
-    def move(self, forward=False, backward=False):
+        self.vel = max(self.vel - self.speed, -self.max_vel / 2)
+        self.move()
+               
+    def move(self):
         radians = math.radians(self.angle)
         vertical = math.cos(radians) * self.vel
         horizontal = math.sin(radians) * self.vel
-        if forward:
-            self.y -= vertical
-            self.x -= horizontal
-        if backward:
-            self.y += vertical
-            self.x += horizontal
+        self.y -= vertical
+        self.x -= horizontal
 
     def reduce_speed(self):
-        self.vel = max(self.vel - self.speed / 2, 0)
+        self.vel = max(self.vel - self.speed, 0)
         self.move()
 
+    def collide(self, mask, x=0, y=0):
+        car_mask = pygame.mask.from_surface(self.car)
+        offset = (int(self.x - x), int(self.y - y))
+        position = mask.overlap(car_mask)
 
+    def bounce(self):
+        self.vel = -self.vel
+        self.move()
+
+    def reset(self):
+        self.x, self.y = self.start_pos
+        self.angle = 0
+        self.vel = 0
+        
 pygame.init()
 
 # Config game
@@ -86,9 +94,29 @@ FPS = 60
 # Load image
 GRASS = Image(pygame.image.load("images/grass.jpg"))
 TRACK = Image(pygame.image.load("images/track.png"))
+TRACK_BORDER = Image(pygame.image.load("images/track-border.png"))
+TRACK_BORDER_MASK = pygame.mask.from_surface(TRACK_BORDER.image)
 
 # Load car image
-RED_CAR = Car(pygame.image.load("images/red-car.png"), 4, 4, (400, 300))
+RED_CAR = Car(pygame.image.load("images/red-car.png"), 2.2, 2, (400, 300))
+
+def move_car(car: Car):
+    keys = pygame.key.get_pressed()
+    moved = False
+    if keys[pygame.K_a]:
+        car.rotate(left=True)
+    if keys[pygame.K_d]:
+        car.rotate(right=True)
+    if keys[pygame.K_w]:
+        moved = True
+        car.move_forward()
+    if keys[pygame.K_s]:
+        moved = True
+        car.move_backward()
+
+    if not moved:
+        car.reduce_speed()
+
 
 
 def gameloop():
@@ -116,24 +144,10 @@ def gameloop():
                 GRASS.scale(event.dict['size'])
         
         pygame.display.update()
-
-        keys = pygame.key.get_pressed()
-        moved = False
-        if keys[pygame.K_a]:
-            RED_CAR.rotate(left=True)
-        if keys[pygame.K_d]:
-            RED_CAR.rotate(right=True)
-        if keys[pygame.K_w]:
-            moved = True
-            RED_CAR.move_forward()
-        if keys[pygame.K_s]:
-            moved = True
-            RED_CAR.move_backward()
-
-        if not moved:
-            RED_CAR.reduce_speed()
-
-    pygame.display.update()
+        move_car(RED_CAR)
+        
+        if RED_CAR.car.collide(TRACK_BORDER_MASK) != None:
+            RED_CAR.bounce()
 
     pygame.quit()
 
