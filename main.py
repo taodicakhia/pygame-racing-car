@@ -116,7 +116,7 @@ def move_car(car: Car):
 
 
 def gameloop():
-    window = Window(pygame.display.set_mode((0, 0), pygame.FULLSCREEN))
+    window = Window(pygame.display.set_mode((1550, 800)))
     # Config game
     FPS = 60
 
@@ -131,12 +131,12 @@ def gameloop():
     TRACK_BORDER_MASK = pygame.mask.from_surface(TRACK_BORDER.get_image_surface())
 
     FINISH = Image(pygame.image.load("images/finish.png"))
-    FINISH.scale((FINISH.width * 0.72, FINISH.height * 0.72))
+    FINISH.scale((FINISH.width * 0.75, FINISH.height * 0.75))
     FINISH_MASK = pygame.mask.from_surface(FINISH.image)
-    FINISH_POSITION = (TRACK_CENTER_POS.x + 133, TRACK_CENTER_POS.y + 230)
+    FINISH_POSITION = (TRACK_CENTER_POS.x + 137, TRACK_CENTER_POS.y + 230)
 
     # Load car image
-    RED_CAR = Car(pygame.image.load("images/red-car.png"), 2.2, 2, (TRACK_CENTER_POS.x + 150, TRACK_CENTER_POS.y + 190))
+    RED_CAR = Car(pygame.image.load("images/red-car.png"), 2.2, 2, (TRACK_CENTER_POS.x + 160, TRACK_CENTER_POS.y + 190))
 
     pygame.display.set_caption('Racing game!')
     is_running = True
