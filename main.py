@@ -16,7 +16,14 @@ class Image:
         return pygame.transform.scale(self.image, self.size)
 
     def show_image(self, window: pygame.Surface, center=False):
-        window.blit(self.get_image_surface(), ((window.get_width() - self.width) / 2, 0) if center is True else (0, 0))
+        center_blit = self.get_center_pos_of_window(window) if center is True else (0, 0)
+        window.blit(self.get_image_surface(), center_blit)
+
+    def show_image_with_position(self, window: pygame.Surface, position=(0, 0)):
+        window.blit(self.get_image_surface(), position)
+
+    def get_center_pos_of_window(self, window: pygame.Surface):
+        return self.get_image_surface().get_rect(center = window.get_rect().center)
 
 class Window:
     def __init__(self, window: pygame.Surface):
@@ -72,10 +79,11 @@ class Car:
         self.vel = max(self.vel - self.speed, 0)
         self.move()
 
-    def collide(self, mask, x=0, y=0):
+    def collide(self, mask, x=0, y=0, top=0, left=0):
         car_mask = pygame.mask.from_surface(self.car)
-        offset = (int(self.x - x), int(self.y - y))
-        position = mask.overlap(car_mask)
+        offset = (int(self.x - x - left), int(self.y - y - top))
+        position = mask.overlap(car_mask, offset)
+        return position
 
     def bounce(self):
         self.vel = -self.vel
@@ -85,20 +93,8 @@ class Car:
         self.x, self.y = self.start_pos
         self.angle = 0
         self.vel = 0
-        
+
 pygame.init()
-
-# Config game
-FPS = 60
-
-# Load image
-GRASS = Image(pygame.image.load("images/grass.jpg"))
-TRACK = Image(pygame.image.load("images/track.png"))
-TRACK_BORDER = Image(pygame.image.load("images/track-border.png"))
-TRACK_BORDER_MASK = pygame.mask.from_surface(TRACK_BORDER.image)
-
-# Load car image
-RED_CAR = Car(pygame.image.load("images/red-car.png"), 2.2, 2, (400, 300))
 
 def move_car(car: Car):
     keys = pygame.key.get_pressed()
@@ -110,7 +106,7 @@ def move_car(car: Car):
     if keys[pygame.K_w]:
         moved = True
         car.move_forward()
-    if keys[pygame.K_s]:
+    elif keys[pygame.K_s]:
         moved = True
         car.move_backward()
 
@@ -120,34 +116,61 @@ def move_car(car: Car):
 
 
 def gameloop():
+    window = Window(pygame.display.set_mode((0, 0), pygame.FULLSCREEN))
+    # Config game
+    FPS = 60
+
+    # Load image
+    GRASS = Image(pygame.image.load("images/grass.jpg"))
+    GRASS.scale((window.width, window.height))
+    TRACK = Image(pygame.image.load("images/track.png"))
+    TRACK.scale((window.height, window.height))
+    TRACK_BORDER = Image(pygame.image.load("images/track-border.png"))
+    TRACK_BORDER.scale((window.height, window.height))
+    TRACK_CENTER_POS = TRACK.get_center_pos_of_window(window.window)
+    TRACK_BORDER_MASK = pygame.mask.from_surface(TRACK_BORDER.get_image_surface())
+
+    FINISH = Image(pygame.image.load("images/finish.png"))
+    FINISH.scale((FINISH.width * 0.72, FINISH.height * 0.72))
+    FINISH_MASK = pygame.mask.from_surface(FINISH.image)
+    FINISH_POSITION = (TRACK_CENTER_POS.x + 133, TRACK_CENTER_POS.y + 230)
+
+    # Load car image
+    RED_CAR = Car(pygame.image.load("images/red-car.png"), 2.2, 2, (TRACK_CENTER_POS.x + 150, TRACK_CENTER_POS.y + 190))
+
     pygame.display.set_caption('Racing game!')
     is_running = True
     clock = pygame.time.Clock()
     clock.tick(FPS)
-    window = Window(pygame.display.set_mode((700, 700), pygame.RESIZABLE | pygame.HWSURFACE | pygame.DOUBLEBUF))
-
-    GRASS.scale((window.width, window.height))
 
     while is_running:
         GRASS.show_image(window.window)
-        TRACK.scale((window.height, window.height))
         TRACK.show_image(window.window, center=True)
+        FINISH.show_image_with_position(window.window, position=FINISH_POSITION)
         RED_CAR.draw(window.window)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 is_running = False
                 break
-            
-            if event.type == pygame.VIDEORESIZE:
-                window.update(event.dict['size'])
-                GRASS.scale(event.dict['size'])
-        
+
         pygame.display.update()
         move_car(RED_CAR)
-        
-        if RED_CAR.car.collide(TRACK_BORDER_MASK) != None:
+
+        if RED_CAR.collide(TRACK_BORDER_MASK, -3, -3, TRACK_CENTER_POS.y, TRACK_CENTER_POS.x):
             RED_CAR.bounce()
+        
+        # Create breakpoint
+
+
+        finish_poi_collide = RED_CAR.collide(FINISH_MASK, *FINISH_POSITION)
+        if finish_poi_collide != None:
+            if finish_poi_collide[1] == 0:
+                RED_CAR.bounce()
+            else:
+                RED_CAR.reset()
+                print("finish")
+
 
     pygame.quit()
 
