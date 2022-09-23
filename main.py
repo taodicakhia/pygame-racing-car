@@ -16,8 +16,8 @@ class Main:
         
     def loop(self):
         while self.is_running:
-            self.check_events()
             self.update()
+            self.check_events()
             self.render()
     
     def update(self):
@@ -27,6 +27,10 @@ class Main:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.is_running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE and self.state_stack[-1].__class__.__name__ == 'Game':
+                    self.pause_game = Pause(self)
+                    self.state_stack.append(self.pause_game)
                 
     def render(self):
         self.state_stack[-1].render()

@@ -20,14 +20,14 @@ class Game(State):
         self.check_collide_finish()
 
     def draw_object(self):
-        self.GRASS.show_image(self.main)
-        self.TRACK.show_image(self.main, center=True)
-        self.FINISH.show_image_with_position(self.main, position=self.FINISH_POSITION)
-        self.BREAKPOINT_1.show_image_with_position(self.main, self.BREAKPOINT_1_POS)
-        self.BREAKPOINT_2.show_image_with_position(self.main, self.BREAKPOINT_2_POS)
-        self.BREAKPOINT_3.show_image_with_position(self.main, self.BREAKPOINT_3_POS)
-        self.BREAKPOINT_4.show_image_with_position(self.main, self.BREAKPOINT_4_POS)
-        self.RED_CAR.draw(self.main)
+        self.GRASS.show_image(self.main.window)
+        self.TRACK.show_image(self.main.window, center=True)
+        self.FINISH.show_image_with_position(self.main.window, position=self.FINISH_POSITION)
+        self.BREAKPOINT_1.show_image_with_position(self.main.window, self.BREAKPOINT_1_POS)
+        self.BREAKPOINT_2.show_image_with_position(self.main.window, self.BREAKPOINT_2_POS)
+        self.BREAKPOINT_3.show_image_with_position(self.main.window, self.BREAKPOINT_3_POS)
+        self.BREAKPOINT_4.show_image_with_position(self.main.window, self.BREAKPOINT_4_POS)
+        self.RED_CAR.draw(self.main.window)
         pygame.display.update()
 
     def move_car(self, car: Car):

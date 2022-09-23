@@ -28,5 +28,9 @@ class Menu(State):
 
         if start_button.is_hovered() and start_button.is_clicked():
             game = Game(self.main)
+            self.main.state_stack.append(game)
+            
+        if quit_button.is_hovered() and quit_button.is_clicked():
+            self.main.is_running = False
 
         pygame.display.update()
