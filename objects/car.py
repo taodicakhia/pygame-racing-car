@@ -2,7 +2,7 @@ import pygame
 import math
 
 class Car:
-    def __init__(self, car: pygame.Surface, max_vel, rotation_vel, start_pos=(0, 0), scale=0.4):
+    def __init__(self, car: pygame.Surface, max_vel, rotation_vel, start_pos=(0, 0), scale=0.5):
         self.car = pygame.transform.scale(car, (car.get_width() * scale, car.get_height() * scale))
         self.max_vel = max_vel
         self.vel = 0

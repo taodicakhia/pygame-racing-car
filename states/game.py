@@ -1,48 +1,33 @@
 import pygame
-from objects.breakpoint import Breakpoint
 from objects.car import Car
-from objects.image import Image
+from objects.elements.image import Image
+from states.state import State
 
-class Game:
-    def __init__(self):
-        pygame.init()
-        self.is_running, self.is_playing = True, False
-        self.width_window, self.height_window = 1550, 800
-        self.FPS = 60
-        self.window = pygame.display.set_mode((self.width_window, self.height_window))
+class Game(State):
+    def __init__(self, game):
+        super().__init__(game)
         self.load_images()
         self.scale_images()
         self.load_masks()
         self.load_breakpoints()
         self.load_cars()
 
-    def game_loop(self):
-        while self.is_playing:
-            pygame.display.set_caption('Racing game!')
-            clock = pygame.time.Clock()
-            clock.tick(self.FPS)
-
-            self.check_events()
-            self.draw_object()
-            self.move_car(self.RED_CAR)
-            self.check_collide_track()
-            self.check_collide_breakpoint()
-        pygame.quit()
-
-    def check_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.is_running, self.is_playing = False, False
+    def render(self):
+        self.draw_object()
+        self.move_car(self.RED_CAR)
+        self.check_collide_track()
+        self.check_collide_breakpoint()
+        self.check_collide_finish()
 
     def draw_object(self):
-        self.GRASS.show_image(self.window)
-        self.TRACK.show_image(self.window, center=True)
-        self.FINISH.show_image_with_position(self.window, position=self.FINISH_POSITION)
-        self.BREAKPOINT_1.show_image_with_position(self.window, self.BREAKPOINT_1_POS)
-        self.BREAKPOINT_2.show_image_with_position(self.window, self.BREAKPOINT_2_POS)
-        self.BREAKPOINT_3.show_image_with_position(self.window, self.BREAKPOINT_3_POS)
-        self.BREAKPOINT_4.show_image_with_position(self.window, self.BREAKPOINT_4_POS)
-        self.RED_CAR.draw(self.window)
+        self.GRASS.show_image(self.main)
+        self.TRACK.show_image(self.main, center=True)
+        self.FINISH.show_image_with_position(self.main, position=self.FINISH_POSITION)
+        self.BREAKPOINT_1.show_image_with_position(self.main, self.BREAKPOINT_1_POS)
+        self.BREAKPOINT_2.show_image_with_position(self.main, self.BREAKPOINT_2_POS)
+        self.BREAKPOINT_3.show_image_with_position(self.main, self.BREAKPOINT_3_POS)
+        self.BREAKPOINT_4.show_image_with_position(self.main, self.BREAKPOINT_4_POS)
+        self.RED_CAR.draw(self.main)
         pygame.display.update()
 
     def move_car(self, car: Car):
@@ -63,12 +48,12 @@ class Game:
             car.reduce_speed()
 
     def check_collide_track(self):
-        if self.RED_CAR.collide(self.TRACK_BORDER_MASK, -3, -3, self.TRACK_CENTER_POS.y, self.TRACK_CENTER_POS.x):
+        if self.RED_CAR.collide(self.TRACK_BORDER_MASK, -6, -6, self.TRACK_CENTER_POS.y, self.TRACK_CENTER_POS.x):
             self.RED_CAR.bounce()
         
     def check_collide_breakpoint(self):
-        BREAKPOINT_POS_COLLIDE = self.RED_CAR.collide(self.BREAKPOINT_1_MASK, *self.BREAKPOINT_1_POS)
-        if BREAKPOINT_POS_COLLIDE:
+        BREAKPOINT_1_POS_COLLIDE = self.RED_CAR.collide(self.BREAKPOINT_1_MASK, *self.BREAKPOINT_1_POS)
+        if BREAKPOINT_1_POS_COLLIDE:
             print("Breakpoint 1")
 
     def check_collide_finish(self):
@@ -87,17 +72,16 @@ class Game:
         self.FINISH = Image(pygame.image.load("images/finish.png"))
 
     def scale_images(self):
-        self.GRASS.scale((self.width_window, self.height_window))
-        self.TRACK.scale((self.height_window, self.height_window))
-        self.TRACK_BORDER.scale((self.height_window, self.height_window))
+        self.GRASS.scale((self.main.width_window, self.main.height_window))
+        self.TRACK.scale((self.main.height_window, self.main.height_window))
+        self.TRACK_BORDER.scale((self.main.height_window, self.main.height_window))
         self.FINISH.scale((self.FINISH.width * 0.75, self.FINISH.height * 0.75))
 
     def load_masks(self):
         self.TRACK_BORDER_MASK = pygame.mask.from_surface(self.TRACK_BORDER.image)
         self.FINISH_MASK = pygame.mask.from_surface(self.FINISH.image)
-        # Position
-        self.TRACK_CENTER_POS = self.TRACK.get_center_pos_of_window(self.window)
-        self.FINISH_POSITION = (self.TRACK_CENTER_POS.x + 137, self.TRACK_CENTER_POS.y + 230)
+        self.TRACK_CENTER_POS = self.TRACK.get_center_pos_of_window(self.main.window)
+        self.FINISH_POSITION = (self.TRACK_CENTER_POS.x + 145, self.TRACK_CENTER_POS.y + 230)
 
     def load_breakpoints(self):
         self.BREAKPOINT_1 = Image(pygame.image.load(f"images/point1.png"))
@@ -119,10 +103,10 @@ class Game:
         self.BREAKPOINT_3_MASK = pygame.mask.from_surface(self.BREAKPOINT_3.image)
         self.BREAKPOINT_4_MASK = pygame.mask.from_surface(self.BREAKPOINT_4.image)
 
-        self.BREAKPOINT_1_POS = (560, 600)
-        self.BREAKPOINT_2_POS = (1002, 688)
-        self.BREAKPOINT_3_POS = (740, 278)
-        self.BREAKPOINT_4_POS = (620, 220)
+        self.BREAKPOINT_1_POS = (495, 600)
+        self.BREAKPOINT_2_POS = (975, 715)
+        self.BREAKPOINT_3_POS = (700, 290)
+        self.BREAKPOINT_4_POS = (575, 220)
 
     def load_cars(self):
         self.RED_CAR = Car(pygame.image.load("images/red-car.png"), 2.2, 2, (self.TRACK_CENTER_POS.x + 160, self.TRACK_CENTER_POS.y + 190))
