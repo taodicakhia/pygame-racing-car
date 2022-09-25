@@ -27,3 +27,6 @@ class Image:
 
     def get_center_pos_of_window(self, window: pygame.Surface):
         return self.image.get_rect(center = window.get_rect().center)
+    
+    def set_alpha(self, alpha):
+        self.image.set_alpha(alpha)

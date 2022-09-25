@@ -1,6 +1,8 @@
 import pygame
 from objects.car import Car
 from objects.elements.image import Image
+from states.breakpoint import Breakpoint
+from states.finish_game import FinishGame
 from states.state import State
 
 class Game(State):
@@ -48,13 +50,13 @@ class Game(State):
             car.reduce_speed()
 
     def check_collide_track(self):
-        if self.RED_CAR.collide(self.TRACK_BORDER_MASK, -6, -6, self.TRACK_CENTER_POS.y, self.TRACK_CENTER_POS.x):
+        if self.RED_CAR.collide(self.TRACK_BORDER_MASK, -4, -4, self.TRACK_CENTER_POS.y, self.TRACK_CENTER_POS.x):
             self.RED_CAR.bounce()
         
     def check_collide_breakpoint(self):
         BREAKPOINT_1_POS_COLLIDE = self.RED_CAR.collide(self.BREAKPOINT_1_MASK, *self.BREAKPOINT_1_POS)
-        if BREAKPOINT_1_POS_COLLIDE:
-            print("Breakpoint 1")
+        if BREAKPOINT_1_POS_COLLIDE != None and not self.BREAKPOINT_1_QUESTION.is_answered:
+            self.main.state_stack.append(self.BREAKPOINT_1_QUESTION)
 
     def check_collide_finish(self):
         finish_poi_collide = self.RED_CAR.collide(self.FINISH_MASK, *self.FINISH_POSITION)
@@ -63,7 +65,8 @@ class Game(State):
                 self.RED_CAR.bounce()
             else:
                 self.RED_CAR.reset()
-                print("finish")
+                finish_game = FinishGame(self.main)
+                self.main.state_stack.append(finish_game)
 
     def load_images(self):
         self.GRASS = Image(pygame.image.load("images/grass.jpg"))
@@ -107,6 +110,11 @@ class Game(State):
         self.BREAKPOINT_2_POS = (975, 715)
         self.BREAKPOINT_3_POS = (700, 290)
         self.BREAKPOINT_4_POS = (575, 220)
+        
+        self.BREAKPOINT_1_QUESTION = Breakpoint(self.main, "data_question/1/question.png", "data_question/1/A.png", "data_question/1/B.png", "data_question/1/C.png", "data_question/1/D.png", "D")
+        # self.BREAKPOINT_2_QUESTION = Breakpoint(self.main)
+        # self.BREAKPOINT_3_QUESTION = Breakpoint(self.main)
+        # self.BREAKPOINT_4_QUESTION = Breakpoint(self.main)
 
     def load_cars(self):
         self.RED_CAR = Car(pygame.image.load("images/red-car.png"), 2.2, 2, (self.TRACK_CENTER_POS.x + 160, self.TRACK_CENTER_POS.y + 190))

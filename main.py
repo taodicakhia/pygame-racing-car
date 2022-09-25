@@ -1,4 +1,5 @@
 import pygame
+from states.breakpoint import Breakpoint
 from states.game import Game
 from states.menu import Menu
 from states.pause_game import Pause
@@ -38,7 +39,7 @@ class Main:
     def load_states(self):
         self.main_menu = Menu(self)
         self.state_stack.append(self.main_menu)
-
+        
 if __name__ == '__main__':
     main = Main()
     main.loop()

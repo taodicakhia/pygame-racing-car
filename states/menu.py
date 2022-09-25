@@ -17,14 +17,14 @@ class Menu(State):
         self.main.window.fill((230, 230, 230))
         self.BACKGROUND.show_image(self.main.window)
 
-        start_button = Button("Start game", 100, 700, 220, 80, btn_color=(120, 255, 120), hovered_btn_color=(46, 255, 46), border_radius=6)
+        start_button = Button("Bắt đầu", 100, 700, 220, 80, btn_color=(120, 255, 120), hovered_btn_color=(46, 255, 46), border_radius=6)
         start_button.draw_button(self.main.window)
         
-        quit_button = Button("Quit", 1152, 700, 220, 80, btn_color=(255, 128, 128), hovered_btn_color=(255, 102, 102), text_color=(255, 255, 255), border_radius=6)
+        quit_button = Button("Thoát", 1152, 700, 220, 80, btn_color=(255, 128, 128), hovered_btn_color=(255, 102, 102), text_color=(255, 255, 255), border_radius=6)
         quit_button.draw_button(self.main.window)
         
-        setting_button = Button("Settings", 636, 700, 220, 80, btn_color=(128, 191, 255), hovered_btn_color=(77, 166, 255), border_radius=6)
-        setting_button.draw_button(self.main.window)
+        # setting_button = Button("Settings", 636, 700, 220, 80, btn_color=(128, 191, 255), hovered_btn_color=(77, 166, 255), border_radius=6)
+        # setting_button.draw_button(self.main.window)
 
         if start_button.is_hovered() and start_button.is_clicked():
             game = Game(self.main)
