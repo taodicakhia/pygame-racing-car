@@ -20,7 +20,7 @@ class Breakpoint(State):
     def __init__(self, game, question, answer_A, answer_B, answer_C, answer_D, answer):
         super().__init__(game)
         self.is_answered = False
-        self.question = ImageRect(pygame.image.load(question), 186, 120, 1100, 200, border_radius=5)
+        self.question = ImageRect(pygame.image.load(question), 186, 80, 1100, 280, border_radius=5)
         self.answers = [AnswerRect('A', pygame.image.load(answer_A), 186, 420, 486, 120, border_radius=5), AnswerRect('B', pygame.image.load(answer_B), 800, 420, 486, 120, border_radius=5), AnswerRect('C', pygame.image.load(answer_C), 186, 580, 486, 120, border_radius=5), AnswerRect('D', pygame.image.load(answer_D), 800, 580, 486, 120, border_radius=5)]
         self.answer = answer
         self.is_answered = False
@@ -52,9 +52,9 @@ class Breakpoint(State):
         
     def scale_images(self):
         self.GRASS.scale((self.main.width_window, self.main.height_window))
-        self.question.scale_image((self.question.image.get_width() * 0.65, self.question.image.get_height() * 0.65))
+        self.question.scale_image((self.question.image.get_width() * 0.5, self.question.image.get_height() * 0.5))
         for item in self.answers:
-            item.scale_image((item.image.get_width() * 0.65, item.image.get_height() * 0.65))
+            item.scale_image((item.image.get_width() * 0.6, item.image.get_height() * 0.6))
         
     def draw_breakpoint(self):
         # Draw question

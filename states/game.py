@@ -1,3 +1,5 @@
+import json
+import random
 import pygame
 from objects.car import Car
 from objects.elements.image import Image
@@ -13,6 +15,9 @@ class Game(State):
         self.load_masks()
         self.load_breakpoints()
         self.load_cars()
+        with open("data_question/data.json", "r") as f:
+            self.questions = json.load(f)
+        self.load_question_breakpoint()
 
     def render(self):
         self.draw_object()
@@ -55,8 +60,17 @@ class Game(State):
         
     def check_collide_breakpoint(self):
         BREAKPOINT_1_POS_COLLIDE = self.RED_CAR.collide(self.BREAKPOINT_1_MASK, *self.BREAKPOINT_1_POS)
-        if BREAKPOINT_1_POS_COLLIDE != None and not self.BREAKPOINT_1_QUESTION.is_answered:
-            self.main.state_stack.append(self.BREAKPOINT_1_QUESTION)
+        if BREAKPOINT_1_POS_COLLIDE != None and not self.BREAKPOINT_1_OBJECT.is_answered:
+            self.main.state_stack.append(self.BREAKPOINT_1_OBJECT)
+        BREAKPOINT_2_POS_COLLIDE = self.RED_CAR.collide(self.BREAKPOINT_2_MASK, *self.BREAKPOINT_2_POS)
+        if BREAKPOINT_2_POS_COLLIDE != None and not self.BREAKPOINT_2_OBJECT.is_answered:
+            self.main.state_stack.append(self.BREAKPOINT_2_OBJECT)
+        BREAKPOINT_3_POS_COLLIDE = self.RED_CAR.collide(self.BREAKPOINT_3_MASK, *self.BREAKPOINT_3_POS)
+        if BREAKPOINT_3_POS_COLLIDE != None and not self.BREAKPOINT_3_OBJECT.is_answered:
+            self.main.state_stack.append(self.BREAKPOINT_3_OBJECT)
+        BREAKPOINT_4_POS_COLLIDE = self.RED_CAR.collide(self.BREAKPOINT_4_MASK, *self.BREAKPOINT_4_POS)
+        if BREAKPOINT_4_POS_COLLIDE != None and not self.BREAKPOINT_4_OBJECT.is_answered:
+            self.main.state_stack.append(self.BREAKPOINT_4_OBJECT)
 
     def check_collide_finish(self):
         finish_poi_collide = self.RED_CAR.collide(self.FINISH_MASK, *self.FINISH_POSITION)
@@ -65,6 +79,7 @@ class Game(State):
                 self.RED_CAR.bounce()
             else:
                 self.RED_CAR.reset()
+                self.load_question_breakpoint()
                 finish_game = FinishGame(self.main)
                 self.main.state_stack.append(finish_game)
 
@@ -110,11 +125,16 @@ class Game(State):
         self.BREAKPOINT_2_POS = (975, 715)
         self.BREAKPOINT_3_POS = (700, 290)
         self.BREAKPOINT_4_POS = (575, 220)
-        
-        self.BREAKPOINT_1_QUESTION = Breakpoint(self.main, "data_question/1/question.png", "data_question/1/A.png", "data_question/1/B.png", "data_question/1/C.png", "data_question/1/D.png", "D")
-        # self.BREAKPOINT_2_QUESTION = Breakpoint(self.main)
-        # self.BREAKPOINT_3_QUESTION = Breakpoint(self.main)
-        # self.BREAKPOINT_4_QUESTION = Breakpoint(self.main)
 
     def load_cars(self):
         self.RED_CAR = Car(pygame.image.load("images/red-car.png"), 2.2, 2, (self.TRACK_CENTER_POS.x + 160, self.TRACK_CENTER_POS.y + 190))
+
+    def load_question_breakpoint(self):
+        BREAKPOINT_1_QUESTION = self.questions[random.randint(0, 12)]
+        BREAKPOINT_2_QUESTION = self.questions[random.randint(13, 19)]
+        BREAKPOINT_3_QUESTION = self.questions[random.randint(20, 27)]
+        BREAKPOINT_4_QUESTION = self.questions[random.randint(28, 32)]
+        self.BREAKPOINT_1_OBJECT = Breakpoint(self.main, BREAKPOINT_1_QUESTION["question"], BREAKPOINT_1_QUESTION["answer_A"], BREAKPOINT_1_QUESTION["answer_B"], BREAKPOINT_1_QUESTION["answer_C"], BREAKPOINT_1_QUESTION["answer_D"], BREAKPOINT_1_QUESTION["answer"])
+        self.BREAKPOINT_2_OBJECT = Breakpoint(self.main, BREAKPOINT_2_QUESTION["question"], BREAKPOINT_2_QUESTION["answer_A"], BREAKPOINT_2_QUESTION["answer_B"], BREAKPOINT_2_QUESTION["answer_C"], BREAKPOINT_2_QUESTION["answer_D"], BREAKPOINT_2_QUESTION["answer"])
+        self.BREAKPOINT_3_OBJECT = Breakpoint(self.main, BREAKPOINT_3_QUESTION["question"], BREAKPOINT_3_QUESTION["answer_A"], BREAKPOINT_3_QUESTION["answer_B"], BREAKPOINT_3_QUESTION["answer_C"], BREAKPOINT_3_QUESTION["answer_D"], BREAKPOINT_3_QUESTION["answer"])
+        self.BREAKPOINT_4_OBJECT = Breakpoint(self.main, BREAKPOINT_4_QUESTION["question"], BREAKPOINT_4_QUESTION["answer_A"], BREAKPOINT_4_QUESTION["answer_B"], BREAKPOINT_4_QUESTION["answer_C"], BREAKPOINT_4_QUESTION["answer_D"], BREAKPOINT_4_QUESTION["answer"])

@@ -14,7 +14,7 @@ class ImageRect:
         
     def draw(self, window: pygame.Surface):
         pygame.draw.rect(window, self.color, self.rect, border_radius=self.border_radius)
-        window.blit(self.image, (self.x + (self.width - self.image.get_width()) / 2 + 30, self.y + (self.height - self.image.get_height()) / 2 + 30))
+        window.blit(self.image, (self.x + (self.width - self.image.get_width()) / 2 + 15, self.y + (self.height - self.image.get_height()) / 2 + 10))
     
     def scale_image(self, size):
         self.width, self.height = size
